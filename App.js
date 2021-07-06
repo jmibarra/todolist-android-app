@@ -1,12 +1,23 @@
 import { StatusBar } from 'expo-status-bar';
-import React, {useState} from 'react';
-import { KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import { Keyboard, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Task from './components/Task';
 
 export default function App() {
-  const [task,setTask] = useState();
+  const [task, setTask] = useState();
+  const [taskItems, setTaskItems] = useState([]);
 
-  //const handleAddTask
+  const handleAddTask = () => {
+    Keyboard.dismiss();
+    setTaskItems([...taskItems, task])
+    setTask("");
+  }
+
+  const completeTask = (index) => {
+    let itemsCopy = [...taskItems];
+    itemsCopy.splice(index,1);
+    setTaskItems(itemsCopy)
+  }
 
   return (
     <View style={styles.container}>
@@ -16,29 +27,33 @@ export default function App() {
         <Text style={styles.sectionTitle}>Mis tareas de hoy</Text>
 
         <View style={styles.items}>
-          {/*Aca va a ir las tareas*/}
-          <Task text={'Task 1'}/>
-          <Task text={'Task 2'}/>
+          {
+            taskItems.map((item, index) => {
+              return (
+                <TouchableOpacity key={index} onPress={() => completeTask(index)}>
+                  <Task text={item} />
+                </TouchableOpacity>     
+              ) 
+            })
+          }
 
         </View>
-
       </View>
-      
-    
+
+
 
       {/* Escribir las tareas */}
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.writeTaskWrapper} >
-        <TextInput style={styles.input} placeholder={'Write a task'} />
-      
+        <TextInput style={styles.input} placeholder={'Write a task'} value={task} onChangeText={text => setTask(text)} />
 
-        <TouchableOpacity> 
+        <TouchableOpacity onPress={() => handleAddTask()}>
           <View style={styles.addWrapper}>
-              <Text style={styles.addText}>+</Text>
+            <Text style={styles.addText}>+</Text>
           </View>
         </TouchableOpacity>
       </KeyboardAvoidingView>
 
-    </View> 
+    </View>
   );
 }
 
@@ -47,18 +62,18 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#E8EAED',
   },
-  taskWrapper:{
+  taskWrapper: {
     paddingTop: 80,
     paddingHorizontal: 20
   },
-  sectionTitle:{
-      fontSize:24,
-      fontWeight:'bold'
+  sectionTitle: {
+    fontSize: 24,
+    fontWeight: 'bold'
   },
-  items:{
+  items: {
     marginTop: 30
   },
-  writeTaskWrapper:{
+  writeTaskWrapper: {
     position: 'absolute',
     bottom: 60,
     width: '100%',
@@ -68,7 +83,7 @@ const styles = StyleSheet.create({
   },
   input: {
     paddingVertical: 15,
-    paddingHorizontal:15,
+    paddingHorizontal: 15,
     backgroundColor: '#FFF',
     borderRadius: 60,
     borderColor: '#C0C0C0',
